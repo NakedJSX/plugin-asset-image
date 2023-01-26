@@ -1,0 +1,22 @@
+{
+  "name": "@nakedjsx/plugin-asset-image",
+  "version": "0.1.0",
+  "description": "Generate and use multiple resolutions and formats from a source image.",
+  "type": "module",
+  "exports": {
+	  ".": "./plugin/index.mjs",
+	  "./jsx": "./jsx/index.jsx"
+  },
+  "scripts": {
+  },
+  "keywords": [
+    "jsx",
+    "image",
+    "graphicsmagick"
+  ],
+  "author": "David Hogan",
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "@nakedjsx/core": "^0.1.1"
+  }
+}
