@@ -16,7 +16,7 @@
   ],
   "author": "David Hogan",
   "license": "BSD-3-Clause",
-  "dependencies": {
+  "peerDependencies": {
     "@nakedjsx/core": "^0.1.1"
   }
 }
