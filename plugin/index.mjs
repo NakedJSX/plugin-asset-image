@@ -155,7 +155,7 @@ async function importAssetImage(context, asset)
         {
             webpSrcSet:     webpSrcSet.join(', '),
             jpegSrcSet:     jpegSrcSet.join(', '),
-            cssClassName:   context.getCssClassName(asset.file, `width: ${displayWidth}px; height: ${displayHeight}px`),
+            css:            `width: ${displayWidth}px; height: ${displayHeight}px`,
             displayWidth,
             displayHeight,
             defaultSrc
@@ -170,7 +170,8 @@ async function importAssetImage(context, asset)
 
 const plugin =
     {
-        type: 'image',
+        type: 'asset',
+        id: 'image',
         importAsset: importAssetImage
     };
 

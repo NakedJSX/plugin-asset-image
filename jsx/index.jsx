@@ -32,6 +32,6 @@ export const Image =
 
                     {/* If we don't have a fallback format source set, then it's just an image for which we have generated width&height css */}
                     {!asset.jpegSrcSet && !asset.pngSrcSet ?
-                        <img className={asset.cssClassName} {...props} /> : false}
+                        <img css={asset.css} {...props} /> : false}
                 </picture>;
     }
