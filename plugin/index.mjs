@@ -2,7 +2,21 @@ import querystring from 'node:querystring';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 
-const log = console.log.bind(console);
+let log;
+let warn;
+
+const plugin =
+    {
+        type: 'asset',
+        id: 'image',
+        importAsset: importAssetImage
+    };
+
+export default function(registerPlugin, logSystem)
+{
+    ({ log, warn } = logSystem);
+    registerPlugin(plugin);
+}
 
 async function importAssetImage(context, asset)
 {
@@ -63,10 +77,6 @@ async function importAssetImage(context, asset)
 
     options.dstDensity = acceptedDensities.sort();
 
-    //
-    // Identify the type and size of original image file
-    //
-
     async function gm(...args)
     {
         return new Promise(
@@ -89,6 +99,10 @@ async function importAssetImage(context, asset)
                     });
             });
     }
+
+    //
+    // Identify the type and size of original image file
+    //
 
     const identifyOutput = await gm('identify', '-format', '%m %w %h', asset.file);
     let [ , originalType, originalWidth, originalHeight ] = identifyOutput.match(/([A-Za-z]+) (\d+) (\d+)/);
@@ -166,16 +180,4 @@ async function importAssetImage(context, asset)
     //
 
     return `export default ${JSON.stringify(resultData)}`;
-}
-
-const plugin =
-    {
-        type: 'asset',
-        id: 'image',
-        importAsset: importAssetImage
-    };
-
-export default function(registerPlugin)
-{
-    registerPlugin(plugin);
 }
