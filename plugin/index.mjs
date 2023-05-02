@@ -22,6 +22,7 @@ async function importAssetImage(context, asset)
 {
     const options =
         {
+            // TODO: support and default to 'auto', png if source is png else jpeg
             fallback:       'jpeg',
             webp:           true,
             // densityBasis:   'height',// TODO - support width basis
@@ -37,19 +38,19 @@ async function importAssetImage(context, asset)
                     // 1.5,    // 150%
                     // 1.75,   // 175%
                     
-                    // For scaled destop resolutions:
+                    // For scaled destop resolutions: (to support each of these, srcDensity needs >= 3)
                         2,      // 200%
                     // 2.2,    // 110%
                     // 2.5,    // 125%
                     // 3,      // 150%
                 ],
+            
+            //
+            // Override the defaults via import query string
+            // e.g. import image from 'some_image.jpeg?image:srcDensity=1
+            //
             ...querystring.decode(asset.optionsString)
         };
-
-    // // hack for testing browser scaling
-    // options.dstDensity = [];
-    // for (let i = 100; i <= 300; i++)
-    //     options.dstDensity.push(i / 100);
 
     for (let [key, value]  of Object.entries(options))
     {
@@ -66,10 +67,12 @@ async function importAssetImage(context, asset)
     {
         dstDensity = Number.parseFloat(dstDensity);
 
-        if (dstDensity > 0) // && dstDensity <= options.srcDensity)
-            acceptedDensities.push(dstDensity);
+        if (dstDensity <= 0)
+            warn(`Ignoring invalid dstDensity ${dstDensity} for ${asset.id}`);
+        else if (dstDensity > options.srcDensity)
+            warn(`Ignoring invalid dstDensity ${dstDensity} for ${asset.id} (can't be larger than the srcDensity of ${options.srcDensity})`);
         else
-            warn(`Ignoring dstDensity ${dstDensity} for ${asset.id} due to srcDensity of ${options.srcDensity}`);
+            acceptedDensities.push(dstDensity);
     }
 
     if (!acceptedDensities.length)
