@@ -1,5 +1,3 @@
-import { JSX } from "@nakedjsx/core/jsx";
-
 export const Image =
     props =>
     {
