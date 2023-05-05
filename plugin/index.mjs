@@ -68,11 +68,20 @@ async function importAssetImage(context, asset)
         dstDensity = Number.parseFloat(dstDensity);
 
         if (dstDensity <= 0)
-            warn(`Ignoring invalid dstDensity ${dstDensity} for ${asset.id}`);
-        else if (dstDensity > options.srcDensity)
-            warn(`Ignoring invalid dstDensity ${dstDensity} for ${asset.id} (can't be larger than the srcDensity of ${options.srcDensity})`);
-        else
+            throw Error(`invalid dstDensity ${dstDensity} for ${asset.id}`);
+        
+        if (dstDensity <= options.srcDensity)
             acceptedDensities.push(dstDensity);
+
+        //
+        // For now, silently ignore requested dst densities higher than the source.
+        // Given that the default is to produce both a 1x and a 2x, any use of 1x 
+        // assets would give a lot of warnings and it wouldn't be fun to have to add
+        // &dstDensity=[1] to every 1x asset import.
+        //
+
+        // else
+        //     warn(`Ignoring invalid dstDensity ${dstDensity} for ${asset.id} (can't be larger than the srcDensity of ${options.srcDensity})`);
     }
 
     if (!acceptedDensities.length)
