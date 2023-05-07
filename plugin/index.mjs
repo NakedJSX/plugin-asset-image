@@ -1,6 +1,7 @@
 import querystring from 'node:querystring';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
+import fsp from 'node:fs/promises';
 
 let log;
 let warn;
@@ -49,6 +50,7 @@ async function importAssetImage(context, asset)
             // Override the defaults via import query string
             // e.g. import image from 'some_image.jpeg?image:srcDensity=1
             //
+
             ...querystring.decode(asset.optionsString)
         };
 
@@ -129,6 +131,7 @@ async function importAssetImage(context, asset)
     // Create destination images in each requested density
     //
 
+    const tmpDir            = await fsp.mkdtemp(path.join(context.dstAssetDir, 'import-'));
     const parsedFilepath    = path.parse(asset.file);
     const webpSrcSet        = [];
     const jpegSrcSet        = [];
@@ -148,11 +151,11 @@ async function importAssetImage(context, asset)
         if (options.webp)
         {
             const outFilename   = `${parsedFilepath.name}-${dstDensityStr}.webp`;
-            const outFilepath   = `${context.dstAssetDir}/${outFilename}`;
+            const outFilepath   = `${tmpDir}/${outFilename}`;
             
             await gm('convert', asset.file, '-resize', `${outWidth}x!`, '-quality', '85', '-define', 'webp:method=6', outFilepath);
 
-            const hashFilename  = await context.hashAndRenameFile(outFilepath);
+            const hashFilename  = await context.hashAndRenameFile(outFilepath, context.dstAssetDir);
             const outUripath    = `/asset/${hashFilename}`;
 
             webpSrcSet.push(`${outUripath} ${dstDensityStr}`);
@@ -162,17 +165,19 @@ async function importAssetImage(context, asset)
         if (options.fallback == 'jpeg')
         {
             const outFilename   = `${parsedFilepath.name}-${dstDensityStr}.jpeg`;
-            const outFilepath   = `${context.dstAssetDir}/${outFilename}`;
+            const outFilepath   = `${tmpDir}/${outFilename}`;
 
             await gm('convert', asset.file, '-resize', `${outWidth}x!`, '-quality', '85', outFilepath);
 
-            const hashFilename  = await context.hashAndRenameFile(outFilepath);
+            const hashFilename  = await context.hashAndRenameFile(outFilepath, context.dstAssetDir);
             const outUripath    = `/asset/${hashFilename}`;
 
             jpegSrcSet.push(`${outUripath} ${dstDensityStr}`);
             defaultSrc = outUripath;
         }
     }
+
+    await fsp.rmdir(tmpDir);
 
     const displayWidth  = options.displayWidth  || Math.ceil(originalWidth  / options.srcDensity);
     const displayHeight = options.displayHeight || Math.ceil(originalHeight / options.srcDensity);
