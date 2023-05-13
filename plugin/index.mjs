@@ -4,7 +4,6 @@ import path from 'node:path';
 import fsp from 'node:fs/promises';
 
 let log;
-let warn;
 
 const plugin =
     {
@@ -13,10 +12,11 @@ const plugin =
         importAsset: importAssetImage
     };
 
-export default function(registerPlugin, logSystem)
+export default function(context)
 {
-    ({ log, warn } = logSystem);
-    registerPlugin(plugin);
+    log = context.logging.log;
+
+    context.register(plugin);
 }
 
 async function importAssetImage(context, asset)
@@ -32,15 +32,15 @@ async function importAssetImage(context, asset)
             srcDensity:     2,
             dstDensity:
                 [
-                    // For unscaled destop resolutions:
-                        1,      // 100%
+                    // For unscaled desktop resolutions:
+                    1,      // 100%
                     // 1.1,    // 110%
                     // 1.25,   // 125%
                     // 1.5,    // 150%
                     // 1.75,   // 175%
                     
-                    // For scaled destop resolutions: (to support each of these, srcDensity needs >= 3)
-                        2,      // 200%
+                    // For scaled desktop resolutions: (to support all of these, srcDensity needs >= 3)
+                    2,      // 200%
                     // 2.2,    // 110%
                     // 2.5,    // 125%
                     // 3,      // 150%
@@ -131,7 +131,7 @@ async function importAssetImage(context, asset)
     // Create destination images in each requested density
     //
 
-    const tmpDir            = await fsp.mkdtemp(path.join(context.dstAssetDir, 'import-'));
+    const tmpDir            = await context.mkdtemp;
     const parsedFilepath    = path.parse(asset.file);
     const webpSrcSet        = [];
     const jpegSrcSet        = [];
@@ -155,8 +155,8 @@ async function importAssetImage(context, asset)
             
             await gm('convert', asset.file, '-resize', `${outWidth}x!`, '-quality', '85', '-define', 'webp:method=6', outFilepath);
 
-            const hashFilename  = await context.hashAndRenameFile(outFilepath, context.dstAssetDir);
-            const outUripath    = `/asset/${hashFilename}`;
+            const hashFilename  = await context.hashAndOutputAsset(outFilepath);
+            const outUripath    = await context.assetUriPath(hashFilename);
 
             webpSrcSet.push(`${outUripath} ${dstDensityStr}`);
             defaultSrc = outUripath;
@@ -169,8 +169,8 @@ async function importAssetImage(context, asset)
 
             await gm('convert', asset.file, '-resize', `${outWidth}x!`, '-quality', '85', outFilepath);
 
-            const hashFilename  = await context.hashAndRenameFile(outFilepath, context.dstAssetDir);
-            const outUripath    = `/asset/${hashFilename}`;
+            const hashFilename  = await context.hashAndOutputAsset(outFilepath);
+            const outUripath    = await context.assetUriPath(hashFilename);
 
             jpegSrcSet.push(`${outUripath} ${dstDensityStr}`);
             defaultSrc = outUripath;

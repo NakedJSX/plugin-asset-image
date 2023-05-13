@@ -9,7 +9,7 @@ export const Image =
             return <img {...props} />;
         
         //
-        // Hopefully we have an '?image' based asset import, which contains
+        // Hopefully we have an ':image:' based asset import, which contains
         // metadata about the assets exported by the NakedJSX build process.
         //
 
