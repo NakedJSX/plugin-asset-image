@@ -131,7 +131,7 @@ async function importAssetImage(context, asset)
     // Create destination images in each requested density
     //
 
-    const tmpDir            = await context.mkdtemp;
+    const tmpDir            = await context.mkdtemp();
     const parsedFilepath    = path.parse(asset.file);
     const webpSrcSet        = [];
     const jpegSrcSet        = [];
