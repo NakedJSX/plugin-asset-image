@@ -23,9 +23,9 @@ export const Image =
 
                     {/* Fallback formats for which we have generated a source set */}
                     {asset.jpegSrcSet
-                        ? <img className={asset.cssClassName} srcset={asset.jpegSrcSet} sizes={asset.displayWidth + 'px'} {...props} />
+                        ? <img css={asset.css} srcset={asset.jpegSrcSet} sizes={asset.displayWidth + 'px'} {...props} />
                         : asset.pngSrcSet
-                            ? <img className={asset.cssClassName} srcset={asset.pngSrcSet} sizes={asset.displayWidth + 'px'} {...props} />
+                            ? <img css={asset.css} srcset={asset.pngSrcSet} sizes={asset.displayWidth + 'px'} {...props} />
                             : false}
 
                     {/* If we don't have a fallback format source set, then it's just an image for which we have generated width&height css */}
