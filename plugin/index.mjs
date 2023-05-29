@@ -39,7 +39,7 @@ async function importAssetImage(context, asset)
                     // 1.75,   // 175%
                     
                     // For scaled desktop resolutions: (to support all of these, srcDensity needs >= 3)
-                    2,      // 200%
+                    2,      // 100%
                     // 2.2,    // 110%
                     // 2.5,    // 125%
                     // 3,      // 150%
@@ -52,6 +52,25 @@ async function importAssetImage(context, asset)
 
             ...querystring.decode(asset.optionsString)
         };
+    
+    const aliases =
+        {
+            dw: 'displayWidth',
+            hh: 'displayHeight',
+            sd: 'srcDensity',
+            dd: 'dstDensity'
+        };
+    
+    for (const [alias, real] of Object.entries(aliases))
+        if (options[alias] !== undefined)
+        {
+            options[real] = options[alias];
+            delete options[alias];
+        }
+
+    //
+    // Support ?webp as a positive boolean
+    //
 
     for (let [key, value]  of Object.entries(options))
     {
@@ -185,7 +204,7 @@ async function importAssetImage(context, asset)
         {
             webpSrcSet:     webpSrcSet.join(', '),
             jpegSrcSet:     jpegSrcSet.join(', '),
-            css:            `width: ${displayWidth}px; height: ${displayHeight}px`,
+            css:            `width: ${displayWidth}px; aspect-ratio: ${displayWidth} / ${displayHeight};`,
             displayWidth,
             displayHeight,
             defaultSrc
