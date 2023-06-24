@@ -7,7 +7,7 @@ let log;
 
 const plugin =
     {
-        type: 'asset',
+        type: 'asset-import',
         importAsset: importAssetImage
     };
 
@@ -173,7 +173,7 @@ async function importAssetImage(context, asset)
             
             await gm('convert', asset.file, '-resize', `${outWidth}x!`, '-quality', '85', '-define', 'webp:method=6', outFilepath);
 
-            const hashFilename  = await context.hashAndOutputAsset(outFilepath);
+            const hashFilename  = await context.hashAndMoveAsset(outFilepath);
             const outUripath    = await context.assetUriPath(hashFilename);
 
             webpSrcSet.push(`${outUripath} ${dstDensityStr}`);
@@ -187,7 +187,7 @@ async function importAssetImage(context, asset)
 
             await gm('convert', asset.file, '-resize', `${outWidth}x!`, '-quality', '85', outFilepath);
 
-            const hashFilename  = await context.hashAndOutputAsset(outFilepath);
+            const hashFilename  = await context.hashAndMoveAsset(outFilepath);
             const outUripath    = await context.assetUriPath(hashFilename);
 
             jpegSrcSet.push(`${outUripath} ${dstDensityStr}`);
