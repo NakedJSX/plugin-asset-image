@@ -8,7 +8,7 @@ let log;
 const plugin =
     {
         type: 'asset-import',
-        importAsset: importAssetImage
+        importAsset
     };
 
 export default function(context)
@@ -18,7 +18,7 @@ export default function(context)
     context.register(plugin);
 }
 
-async function importAssetImage(context, asset)
+async function importAsset(context, asset)
 {
     const options =
         {
