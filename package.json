@@ -1,6 +1,6 @@
 {
   "name": "@nakedjsx/plugin-asset-image",
-  "version": "0.14.3-test.5",
+  "version": "0.14.3-test.6",
   "description": "Generate and use multiple resolutions and formats from a source image.",
   "type": "module",
   "exports": {
